@@ -1,5 +1,5 @@
 {
-  "name": "myapi",
+  "name": "drdb-api",
   "version": "0.0.1",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
