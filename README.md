@@ -15,7 +15,7 @@ yarn
 
 Add database config
 - Create `.env` based on `.env.example`
-- Update dev information
+- Update dev DB information
 
 Run the api using
 ```sh
