@@ -7,6 +7,7 @@ module.exports = [
     username: process.env.DEV_DATABASE_USER,
     password: process.env.DEV_DATABASE_PASSWORD,
     database: process.env.DEV_DATABASE_NAME,
+    // dropSchema: true,
     synchronize: true,
     logging: true,
     entities: ['src/entity/**/*.ts'],

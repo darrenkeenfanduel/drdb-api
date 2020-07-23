@@ -1,5 +1,4 @@
-import { createTokens } from './auth';
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from './constants';
+require('dotenv').config();
 import 'reflect-metadata';
 import { createConnection, getConnectionOptions } from 'typeorm';
 import express from 'express';
@@ -10,8 +9,10 @@ import { verify } from 'jsonwebtoken';
 import addSeconds from 'date-fns/addSeconds';
 import addDays from 'date-fns/addDays';
 
+import { createTokens } from './auth';
+import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from './helpers/secrets';
 import { AuthResolver } from './resolvers/AuthResolver';
-import { VideoResolver } from './resolvers/VideoResolver';
+import { ResourceResolver } from './resolvers/ResourceResolver';
 import { User } from './entity/User';
 
 (async () => {
@@ -26,7 +27,7 @@ import { User } from './entity/User';
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [AuthResolver, VideoResolver],
+      resolvers: [AuthResolver, ResourceResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({ req, res }),
@@ -44,7 +45,7 @@ import { User } from './entity/User';
       return next();
     }
     try {
-      const data = verify(accessToken, ACCESS_TOKEN_SECRET) as {
+      const data = verify(accessToken, ACCESS_TOKEN_SECRET!) as {
         userId: number;
       };
       req.userId = data.userId;
@@ -58,7 +59,7 @@ import { User } from './entity/User';
     let data;
 
     try {
-      data = verify(refreshToken, REFRESH_TOKEN_SECRET) as {
+      data = verify(refreshToken, REFRESH_TOKEN_SECRET!) as {
         userId: number;
         count: number;
       };

@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { Field, Int, ObjectType } from 'type-graphql';
+import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
 
 @ObjectType()
 @Entity()
-export class Video extends BaseEntity {
+export class Resource extends BaseTableEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
