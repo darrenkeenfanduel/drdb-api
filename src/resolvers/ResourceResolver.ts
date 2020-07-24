@@ -59,8 +59,11 @@ export class ResourceResolver {
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async deleteResource(@Arg('id', () => Int) id: number) {
-    await Resource.delete({ id });
-    return true;
+    const res = await Resource.delete({ id });
+    if (res.affected) {
+      return true;
+    }
+    return false;
   }
 
   @Query(() => [Resource])
