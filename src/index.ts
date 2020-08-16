@@ -13,6 +13,8 @@ import { createTokens } from './auth';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from './helpers/secrets';
 import { AuthResolver } from './resolvers/AuthResolver';
 import { ResourceResolver } from './resolvers/ResourceResolver';
+import { UserRoleResolver } from './resolvers/UserRoleResolver';
+import { UserResolver } from './resolvers/UserResolver';
 import { User } from './entity/User';
 
 (async () => {
@@ -27,7 +29,12 @@ import { User } from './entity/User';
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [AuthResolver, ResourceResolver],
+      resolvers: [
+        AuthResolver,
+        ResourceResolver,
+        UserRoleResolver,
+        UserResolver,
+      ],
       validate: false,
     }),
     context: ({ req, res }) => ({ req, res }),

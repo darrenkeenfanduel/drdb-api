@@ -1,6 +1,6 @@
-import { REFRESH_TOKEN_SECRET, ACCESS_TOKEN_SECRET } from './helpers/secrets';
 import { sign } from 'jsonwebtoken';
 
+import { REFRESH_TOKEN_SECRET, ACCESS_TOKEN_SECRET } from './helpers/secrets';
 import { User } from './entity/User';
 
 export const createTokens = (user: User) => {

@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { UserProfile } from './UserProfile';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Field, ObjectType } from 'type-graphql';
 
 import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
@@ -17,6 +24,15 @@ export class User extends BaseTableEntity {
   @Column('text', { unique: true })
   email: string;
 
+  @Field(() => [String])
+  @Column('text', { array: true, default: '{}' })
+  roles: string[];
+
   @Column()
   password: string;
+
+  @OneToOne(() => UserProfile)
+  @Field(() => UserProfile)
+  @JoinColumn()
+  profile: UserProfile;
 }

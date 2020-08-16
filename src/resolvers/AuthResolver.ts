@@ -1,3 +1,4 @@
+import { UserProfile } from './../entity/UserProfile';
 import bcrypt from 'bcryptjs';
 import { Arg, Ctx, Mutation, Resolver, Query } from 'type-graphql';
 import addDays from 'date-fns/addDays';
@@ -39,9 +40,12 @@ export class AuthResolver {
       };
     }
 
+    const profile = await UserProfile.create().save();
+
     const user = await User.create({
       email,
       password: hashedPassword,
+      profile,
     }).save();
 
     return { user };
@@ -82,22 +86,17 @@ export class AuthResolver {
       return undefined;
     }
 
-    return User.findOne(ctx.req.userId);
+    return User.findOne(ctx.req.userId, { relations: ['profile'] });
   }
 
   @Mutation(() => Boolean)
   async logout(@Ctx() ctx: MyContext): Promise<Boolean> {
-    return new Promise((res, rej) =>
-      ctx.req.session!.destroy((err) => {
-        if (err) {
-          console.log(err);
-          return rej(false);
-        }
-
-        ctx.res.clearCookie('qid');
-        return res(true);
-      })
-    );
+    if (ctx.req.userId) {
+      ctx.res.clearCookie('refresh-token');
+      ctx.res.clearCookie('access-token');
+      return true;
+    }
+    return false;
   }
 
   @Mutation(() => Boolean)

@@ -3,11 +3,11 @@ import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
 export abstract class BaseTableEntity extends BaseEntity {
-  @Field()
+  @Field({ nullable: true })
   @Column({ name: 'created_at', nullable: true })
   public createdAt: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({ name: 'updated_at', nullable: true })
   public updatedAt: string;
 

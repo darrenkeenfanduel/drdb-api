@@ -32,9 +32,9 @@ Currently the following are in play
 
 You can register, login and get your details using the above mutation/queries. See schema docs for input information
 
-### Videos (videos/createVideo/updateVideo/deleteVideo)
+### Resources (resources/createRecource/updateRecource/deleteRecource)
 
-You can do some basic CRUD for Videos currently. See schema docs for input information
+You can do some basic CRUD for Recources currently. See schema docs for input information
 
 ## Deploy
 
