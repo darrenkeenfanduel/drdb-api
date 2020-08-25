@@ -1,3 +1,4 @@
+import { Resource } from './Resource';
 import { UserProfile } from './UserProfile';
 import {
   Entity,
@@ -5,6 +6,7 @@ import {
   Column,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Field, ObjectType } from 'type-graphql';
 
@@ -38,6 +40,9 @@ export class User extends BaseTableEntity {
 
   @Column()
   password: string;
+
+  @OneToMany(() => Resource, (resource) => resource.added_by)
+  resources: Resource[];
 
   @OneToOne(() => UserProfile)
   @Field(() => UserProfile)

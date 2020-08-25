@@ -14,6 +14,7 @@ import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from './helpers/secrets';
 import { AuthResolver } from './resolvers/AuthResolver';
 import { ResourceResolver } from './resolvers/ResourceResolver';
 import { UserRoleResolver } from './resolvers/UserRoleResolver';
+import { UserFavouriteResolver } from './resolvers/UserFavouriteResolver';
 import { UserResolver } from './resolvers/UserResolver';
 import { User } from './entity/User';
 
@@ -34,6 +35,7 @@ import { User } from './entity/User';
         ResourceResolver,
         UserRoleResolver,
         UserResolver,
+        UserFavouriteResolver,
       ],
       validate: false,
     }),

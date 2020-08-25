@@ -5,6 +5,8 @@ import {
   Column,
   OneToOne,
   JoinColumn,
+  OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { Field, Int, ObjectType } from 'type-graphql';
 import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
@@ -44,7 +46,7 @@ export class Resource extends BaseTableEntity {
   @Column()
   external_url: string;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User, (user) => user.resources)
   @Field(() => User)
   @JoinColumn()
   added_by: User;

@@ -17,7 +17,6 @@ export const hasRole: (role: string) => MiddlewareFn<MyContext> = (
   if (!context.req.userId) {
     throw new ApolloError('not authenticated');
   }
-  console.log('args', args);
 
   const user = await User.findOne(context.req.userId);
   if (user && user.roles.includes(role)) {

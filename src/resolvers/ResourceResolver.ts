@@ -1,3 +1,5 @@
+import { MyContext } from './../graphql-types/MyContext';
+import { User } from './../entity/User';
 import {
   Resolver,
   Mutation,
@@ -7,6 +9,7 @@ import {
   InputType,
   Field,
   UseMiddleware,
+  Ctx,
 } from 'type-graphql';
 
 import { isAuth } from '../middleware/isAuth';
@@ -38,6 +41,7 @@ class ResourceInput {
   type: string;
   @Field()
   level: string;
+  added_by?: User;
 }
 
 @InputType()
@@ -56,9 +60,13 @@ export class ResourceResolver {
   @Mutation(() => Resource)
   @UseMiddleware(isAuth)
   async createResource(
+    @Ctx() ctx: MyContext,
     @Arg('options', () => ResourceInput) options: ResourceInput
   ) {
-    console.log(options);
+    const addedByUser = await User.findOne(ctx.req.userId);
+    if (addedByUser) {
+      options.added_by = addedByUser;
+    }
     const resource = await Resource.create(options).save();
     return resource;
   }
@@ -86,6 +94,6 @@ export class ResourceResolver {
 
   @Query(() => [Resource])
   resources() {
-    return Resource.find();
+    return Resource.find({ relations: ['added_by', 'added_by.profile'] });
   }
 }
