@@ -20,6 +20,24 @@ class ResourceInput {
   minutes: number;
   @Field(() => [String])
   languages: string[];
+  @Field()
+  small_description: string;
+  @Field()
+  description: string;
+  @Field(() => Int, { nullable: true })
+  length?: number;
+  @Field(() => String, { nullable: true })
+  author?: string;
+  @Field(() => String, { nullable: true })
+  author_url?: string;
+  @Field()
+  external_url: string;
+  @Field()
+  cost: string;
+  @Field()
+  type: string;
+  @Field()
+  level: string;
 }
 
 @InputType()

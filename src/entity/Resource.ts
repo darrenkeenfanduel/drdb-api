@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { User } from './User';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Field, Int, ObjectType } from 'type-graphql';
 import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
 
@@ -13,11 +20,44 @@ export class Resource extends BaseTableEntity {
   @Column()
   title: string;
 
-  @Field(() => Int)
-  @Column('int', { default: 60 })
-  minutes: number;
+  @Field()
+  @Column()
+  small_description: string;
 
-  @Field(() => [String])
-  @Column('text', { array: true })
-  languages: string[];
+  @Field()
+  @Column()
+  description: string;
+
+  @Field(() => Int, { nullable: true })
+  @Column('int', { nullable: true })
+  length?: number;
+
+  @Field()
+  @Column('text', { default: 'unknown' })
+  author?: string;
+
+  @Field(() => String, { nullable: true })
+  @Column('text', { nullable: true })
+  author_url?: string;
+
+  @Field()
+  @Column()
+  external_url: string;
+
+  @OneToOne(() => User)
+  @Field(() => User)
+  @JoinColumn()
+  added_by: User;
+
+  @Field()
+  @Column()
+  cost: string;
+
+  @Field()
+  @Column()
+  type: string;
+
+  @Field()
+  @Column()
+  level: string;
 }

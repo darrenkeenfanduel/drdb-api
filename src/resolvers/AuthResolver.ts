@@ -6,7 +6,7 @@ import addMinutes from 'date-fns/addMinutes';
 
 import { createTokens } from './../auth';
 import { User } from '../entity/User';
-import { AuthInput } from '../graphql-types/AuthInput';
+import { AuthInput, RegisterInput } from '../graphql-types/AuthInput';
 import { MyContext } from '../graphql-types/MyContext';
 import { UserResponse } from '../graphql-types/UserResponse';
 
@@ -24,7 +24,7 @@ export class AuthResolver {
   @Mutation(() => UserResponse)
   async register(
     @Arg('input')
-    { email, password }: AuthInput
+    { email, password, first_name, last_name }: RegisterInput
   ): Promise<UserResponse> {
     const hashedPassword = await bcrypt.hash(password, 12);
     const existingUser = await User.findOne({ email });
@@ -45,6 +45,8 @@ export class AuthResolver {
     const user = await User.create({
       email,
       password: hashedPassword,
+      first_name,
+      last_name,
       profile,
     }).save();
 

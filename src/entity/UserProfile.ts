@@ -10,11 +10,11 @@ export class UserProfile extends BaseTableEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('text', { nullable: true })
   avatar?: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('text', { nullable: true })
   dob?: string;
 
@@ -22,7 +22,7 @@ export class UserProfile extends BaseTableEntity {
   @Column('boolean', { default: false })
   marketing_preference: boolean;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('text', { nullable: true })
   marketing_method_preference?: string;
 }

@@ -17,6 +17,14 @@ export class User extends BaseTableEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Field()
+  @Column()
+  first_name: string;
+
+  @Field()
+  @Column()
+  last_name: string;
+
   @Column('int', { default: 0 })
   count: number;
 

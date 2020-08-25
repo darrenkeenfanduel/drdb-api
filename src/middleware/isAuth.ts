@@ -20,8 +20,9 @@ export const hasRole: (role: string) => MiddlewareFn<MyContext> = (
   console.log('args', args);
 
   const user = await User.findOne(context.req.userId);
-  // console.log(user, role);
-
+  if (user && user.roles.includes(role)) {
+    return next();
+  }
   return next();
 };
 
