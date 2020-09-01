@@ -13,6 +13,7 @@ import { createTokens } from './auth';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from './helpers/secrets';
 import { AuthResolver } from './resolvers/AuthResolver';
 import { ResourceResolver } from './resolvers/ResourceResolver';
+import { ResourceViewsResolver } from './resolvers/ResourceViewsResolver';
 import { UserRoleResolver } from './resolvers/UserRoleResolver';
 import { UserFavouriteResolver } from './resolvers/UserFavouriteResolver';
 import { UserResolver } from './resolvers/UserResolver';
@@ -33,6 +34,7 @@ import { User } from './entity/User';
       resolvers: [
         AuthResolver,
         ResourceResolver,
+        ResourceViewsResolver,
         UserRoleResolver,
         UserResolver,
         UserFavouriteResolver,

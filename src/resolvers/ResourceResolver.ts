@@ -94,6 +94,8 @@ export class ResourceResolver {
 
   @Query(() => [Resource])
   resources() {
-    return Resource.find({ relations: ['added_by', 'added_by.profile'] });
+    return Resource.find({
+      relations: ['views', 'added_by', 'added_by.profile'],
+    });
   }
 }

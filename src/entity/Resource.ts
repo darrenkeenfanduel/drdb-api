@@ -1,3 +1,4 @@
+import { ResourceViews } from './ResourceViews';
 import { User } from './User';
 import {
   Entity,
@@ -50,6 +51,11 @@ export class Resource extends BaseTableEntity {
   @Field(() => User)
   @JoinColumn()
   added_by: User;
+
+  @OneToOne(() => ResourceViews, (resourceViews) => resourceViews.resource)
+  @Field(() => ResourceViews, { nullable: true })
+  @JoinColumn()
+  views?: ResourceViews;
 
   @Field()
   @Column()
