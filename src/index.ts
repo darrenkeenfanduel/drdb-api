@@ -45,7 +45,11 @@ useContainer(Container);
         UserFavouriteResolver,
       ],
       container: Container,
-      validate: false,
+      validate: true,
+      emitSchemaFile: {
+        path: __dirname + 'schema.graphql',
+        commentDescriptions: true,
+      },
     }),
     context: ({ req, res }) => ({ req, res }),
     playground: {

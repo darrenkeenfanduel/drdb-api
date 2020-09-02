@@ -20,31 +20,42 @@ import { MyContext } from '../graphql-types/MyContext';
 import { User } from '../entity/User';
 import { Resource } from '../entity/Resource';
 import { ResourceRating } from '../entity/ResourceRating';
+import { Min, Max } from 'class-validator';
 
 @InputType()
 class ResourceRatingInput {
   @Field(() => Int)
   resourceId: number;
-  updatedAt?: string;
-}
 
-@InputType()
-class WhereResource {
-  @Field(() => String, { nullable: true })
-  title?: string;
+  @Field()
+  text: string;
+
+  @Field(() => Int)
+  @Min(1)
+  @Max(5)
+  rating: number;
+
+  updatedAt?: string;
 }
 
 @ArgsType()
 class GetResourceRatingArgs {
   @Field(() => Int, { nullable: true })
   resourceId?: number;
+
+  @Field(() => Int, { nullable: true })
+  userId?: number;
 }
 
 @Resolver()
 export class ResourceRatingResolver {
   constructor(
     @InjectRepository(ResourceRating)
-    private readonly resourceRatingRepo: Repository<ResourceRating>
+    private readonly resourceRatingRepo: Repository<ResourceRating>,
+    @InjectRepository(Resource)
+    private readonly resourceRepo: Repository<Resource>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>
   ) {}
 
   @Mutation(() => Boolean)
@@ -53,28 +64,48 @@ export class ResourceRatingResolver {
     @Ctx() ctx: MyContext,
     @Arg('options', () => ResourceRatingInput) options: ResourceRatingInput
   ) {
-    const user = await User.findOne(ctx.req.userId);
+    const user = await this.userRepo.findOne(ctx.req.userId);
     if (!user) {
       throw new ApolloError('No user');
     }
-    const resource = await Resource.findOne(options.resourceId);
+    const resource = await this.resourceRepo.findOne(options.resourceId);
     if (!resource) {
       throw new ApolloError('No resource exists');
     }
 
-    await ResourceRating.create({ resource, user }).save();
+    const existingReview = await this.resourceRatingRepo.findOne({
+      where: { user: { id: user.id }, resource: { id: resource.id } },
+    });
+
+    if (existingReview) {
+      throw new ApolloError('Already have rating');
+    }
+
+    await this.resourceRatingRepo
+      .create({
+        resource,
+        user,
+        rating: options.rating,
+        text: options.text,
+      })
+      .save();
 
     return true;
   }
 
   @Query(() => [ResourceRating])
-  async resourceRatings(@Args() { resourceId }: GetResourceRatingArgs) {
-    if (resourceId) {
-      return this.resourceRatingRepo.find({
-        where: { resource: resourceId },
-        relations: ['user', 'resource'],
-      });
-    }
-    return this.resourceRatingRepo.find({ relations: ['user', 'resource'] });
+  async resourceRatings(@Args() { resourceId, userId }: GetResourceRatingArgs) {
+    const where: {
+      resource?: number;
+      user?: number;
+    } = {
+      ...(resourceId && { resource: resourceId }),
+      ...(userId && { user: userId }),
+    };
+
+    return this.resourceRatingRepo.find({
+      where,
+      relations: ['user', 'resource'],
+    });
   }
 }
