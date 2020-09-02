@@ -47,7 +47,7 @@ useContainer(Container);
       container: Container,
       validate: true,
       emitSchemaFile: {
-        path: __dirname + 'schema.graphql',
+        path: __dirname + '/schema.graphql',
         commentDescriptions: true,
       },
     }),

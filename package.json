@@ -36,6 +36,6 @@
   "scripts": {
     "start": "nodemon --exec ts-node --files src/index.ts",
     "build": "tsc",
-    "schema:generate": "graphdoc -s ./srcschema.graphql -o ./docs --force"
+    "schema:generate": "graphdoc -s ./src/schema.graphql -o ./docs --force"
   }
 }
