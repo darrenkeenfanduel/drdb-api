@@ -28,13 +28,8 @@ You can now access on [https://localhost:4000/graphql](https://localhost:4000/gr
 
 Currently the following are in play
 
-### Auth (register/login/me)
-
-You can register, login and get your details using the above mutation/queries. See schema docs for input information
-
-### Resources (resources/createRecource/updateRecource/deleteRecource)
-
-You can do some basic CRUD for Recources currently. See schema docs for input information
+## Schema
+[Schema docs](https://darrenkeenfanduel.github.io/drdb-api/)
 
 ## Deploy
 
