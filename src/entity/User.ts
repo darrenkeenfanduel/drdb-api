@@ -14,7 +14,7 @@ import { ResourceRating } from './ResourceRating';
 import { Resource } from './Resource';
 import { UserProfile } from './UserProfile';
 
-@ObjectType()
+@ObjectType({ description: 'User model' })
 @Entity()
 export class User extends BaseTableEntity {
   @Field()
@@ -47,7 +47,7 @@ export class User extends BaseTableEntity {
   resources: Resource[];
 
   @OneToOne(() => UserProfile)
-  @Field(() => UserProfile)
+  @Field(() => UserProfile, { description: 'Attached profile of user' })
   @JoinColumn()
   profile: UserProfile;
 }

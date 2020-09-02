@@ -10,7 +10,7 @@ import { Field, Int, ObjectType } from 'type-graphql';
 import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
 
 import { Resource } from './Resource';
-@ObjectType()
+@ObjectType({ description: 'Views for a single resource' })
 @Entity()
 export class ResourceViews extends BaseTableEntity {
   @Field(() => Int)

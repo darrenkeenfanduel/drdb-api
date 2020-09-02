@@ -110,6 +110,7 @@ input ResourceViewInput {
   resourceId: Int!
 }
 
+# Views for a single resource
 type ResourceViews {
   createdAt: String
   updatedAt: String
@@ -129,6 +130,7 @@ input updateUserRolesInput {
   roles: [Int!]!
 }
 
+# User model
 type User {
   createdAt: String
   updatedAt: String
@@ -137,6 +139,8 @@ type User {
   last_name: String!
   email: String!
   roles: [String!]!
+
+  # Attached profile of user
   profile: UserProfile!
 }
 
