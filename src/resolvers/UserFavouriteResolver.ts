@@ -1,8 +1,3 @@
-import { ApolloError } from 'apollo-server-express';
-import { MyContext } from './../graphql-types/MyContext';
-import { UserFavourite } from './../entity/UserFavourite';
-import { Resource } from './../entity/Resource';
-import { User } from './../entity/User';
 import {
   Resolver,
   Mutation,
@@ -14,9 +9,14 @@ import {
   UseMiddleware,
   Ctx,
 } from 'type-graphql';
+import { ApolloError } from 'apollo-server-express';
 
-import { isAuth } from '../middleware/isAuth';
+import { MyContext } from './../graphql-types/MyContext';
+import { UserFavourite } from './../entity/UserFavourite';
+import { Resource } from './../entity/Resource';
+import { User } from './../entity/User';
 import { UserRole } from '../entity/UserRole';
+import { isAuth } from '../middleware/isAuth';
 
 @InputType()
 class UserFavouriteInput {

@@ -1,4 +1,3 @@
-import { UserProfile } from './../entity/UserProfile';
 import bcrypt from 'bcryptjs';
 import { Arg, Ctx, Mutation, Resolver, Query } from 'type-graphql';
 import addDays from 'date-fns/addDays';
@@ -6,6 +5,7 @@ import addMinutes from 'date-fns/addMinutes';
 
 import { createTokens } from './../auth';
 import { User } from '../entity/User';
+import { UserProfile } from './../entity/UserProfile';
 import { AuthInput, RegisterInput } from '../graphql-types/AuthInput';
 import { MyContext } from '../graphql-types/MyContext';
 import { UserResponse } from '../graphql-types/UserResponse';

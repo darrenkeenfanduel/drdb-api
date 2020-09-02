@@ -1,4 +1,3 @@
-import { UserProfile } from './../entity/UserProfile';
 import {
   Resolver,
   Mutation,
@@ -9,11 +8,12 @@ import {
   Field,
 } from 'type-graphql';
 import * as Parallel from 'async-parallel';
+import { ApolloError } from 'apollo-server-express';
 
 import { isAuth, hasRoleOrOwner, hasRole } from '../middleware/isAuth';
 import { UserRole } from './../entity/UserRole';
 import { User } from './../entity/User';
-import { ApolloError } from 'apollo-server-express';
+import { UserProfile } from './../entity/UserProfile';
 
 @InputType()
 class updateUserRolesInput {

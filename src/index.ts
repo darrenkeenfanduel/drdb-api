@@ -1,9 +1,10 @@
 require('dotenv').config();
 import 'reflect-metadata';
-import { createConnection, getConnectionOptions } from 'typeorm';
+import { createConnection, getConnectionOptions, useContainer } from 'typeorm';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
+import { Container } from 'typedi';
 import cookieParser from 'cookie-parser';
 import { verify } from 'jsonwebtoken';
 import addSeconds from 'date-fns/addSeconds';
@@ -14,10 +15,13 @@ import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from './helpers/secrets';
 import { AuthResolver } from './resolvers/AuthResolver';
 import { ResourceResolver } from './resolvers/ResourceResolver';
 import { ResourceViewsResolver } from './resolvers/ResourceViewsResolver';
+import { ResourceRatingResolver } from './resolvers/ResourceRatingResolver';
 import { UserRoleResolver } from './resolvers/UserRoleResolver';
 import { UserFavouriteResolver } from './resolvers/UserFavouriteResolver';
 import { UserResolver } from './resolvers/UserResolver';
 import { User } from './entity/User';
+
+useContainer(Container);
 
 (async () => {
   const app = express();
@@ -35,10 +39,12 @@ import { User } from './entity/User';
         AuthResolver,
         ResourceResolver,
         ResourceViewsResolver,
+        ResourceRatingResolver,
         UserRoleResolver,
         UserResolver,
         UserFavouriteResolver,
       ],
+      container: Container,
       validate: false,
     }),
     context: ({ req, res }) => ({ req, res }),

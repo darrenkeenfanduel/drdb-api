@@ -1,15 +1,15 @@
-import { ResourceViews } from './ResourceViews';
-import { User } from './User';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
   JoinColumn,
-  OneToMany,
   ManyToOne,
 } from 'typeorm';
 import { Field, Int, ObjectType } from 'type-graphql';
+
+import { ResourceViews } from './ResourceViews';
+import { User } from './User';
 import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
 
 @ObjectType()

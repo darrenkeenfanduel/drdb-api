@@ -1,5 +1,3 @@
-import { MyContext } from './../graphql-types/MyContext';
-import { User } from './../entity/User';
 import {
   Resolver,
   Mutation,
@@ -12,7 +10,9 @@ import {
   Ctx,
 } from 'type-graphql';
 
+import { MyContext } from './../graphql-types/MyContext';
 import { isAuth } from '../middleware/isAuth';
+import { User } from './../entity/User';
 import { Resource } from '../entity/Resource';
 
 @InputType()

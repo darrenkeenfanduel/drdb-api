@@ -1,6 +1,4 @@
 import { ApolloError } from 'apollo-server-express';
-import { ResourceViews } from './../entity/ResourceViews';
-import { Resource } from './../entity/Resource';
 import {
   Resolver,
   Mutation,
@@ -12,6 +10,8 @@ import {
   UseMiddleware,
 } from 'type-graphql';
 
+import { ResourceViews } from './../entity/ResourceViews';
+import { Resource } from './../entity/Resource';
 import { isAuth } from '../middleware/isAuth';
 
 @InputType()

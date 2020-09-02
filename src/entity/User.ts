@@ -1,5 +1,3 @@
-import { Resource } from './Resource';
-import { UserProfile } from './UserProfile';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -11,6 +9,10 @@ import {
 import { Field, ObjectType } from 'type-graphql';
 
 import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
+import { ResourceRating } from './ResourceRating';
+
+import { Resource } from './Resource';
+import { UserProfile } from './UserProfile';
 
 @ObjectType()
 @Entity()
