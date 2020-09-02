@@ -33,6 +33,7 @@ type Mutation {
   createUserRole(options: UserRoleInput!): UserRole!
   deleteUserRole(id: Int!): Boolean!
   createUserFavourite(options: UserFavouriteInput!): UserFavourite!
+  deleteUserFavourite(id: Int!): Boolean!
   updateUserProfile(input: updateUserProfileInput!, id: Int!): Boolean!
   updateUsersRoles(input: updateUserRolesInput!, id: Int!): Boolean!
 }
@@ -43,7 +44,7 @@ type Query {
   resourceViews: [ResourceViews!]!
   resourceRatings(resourceId: Int, userId: Int): [ResourceRating!]!
   userRoles: [UserRole!]!
-  userFavourite: [UserFavourite!]!
+  userFavourite(resourceId: Int, userId: Int): [UserFavourite!]!
 }
 
 input RegisterInput {
