@@ -29,7 +29,7 @@ You can now access on [https://localhost:4000/graphql](https://localhost:4000/gr
 Currently the following are in play
 
 ## Schema
-[Schema docs](https://darrenkeenfanduel.github.io/drdb-api/)
+[Schema docs](https://darrenkeen.github.io/drdb-api/)
 
 ## Deploy
 
