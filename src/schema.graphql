@@ -28,6 +28,8 @@ type Mutation {
   deleteResource(id: Int!): Boolean!
   newResourceView(options: ResourceViewInput!): Boolean!
   createResourceRating(options: ResourceRatingInput!): Boolean!
+  updateResourceRating(input: ResourceRatingUpdateInput!, id: Int!): Boolean!
+  deleteResourceRating(id: Int!): Boolean!
   createUserRole(options: UserRoleInput!): UserRole!
   deleteUserRole(id: Int!): Boolean!
   createUserFavourite(options: UserFavouriteInput!): UserFavourite!
@@ -98,6 +100,11 @@ input ResourceRatingInput {
   resourceId: Int!
   text: String!
   rating: Int!
+}
+
+input ResourceRatingUpdateInput {
+  text: String
+  rating: Int
 }
 
 input ResourceUpdateInput {

@@ -34,6 +34,17 @@ class ResourceRatingInput {
   @Min(1)
   @Max(5)
   rating: number;
+}
+
+@InputType()
+class ResourceRatingUpdateInput {
+  @Field(() => String, { nullable: true })
+  text?: string;
+
+  @Field(() => Int, { nullable: true })
+  @Min(1)
+  @Max(5)
+  rating?: number;
 
   updatedAt?: string;
 }
@@ -90,6 +101,40 @@ export class ResourceRatingResolver {
       })
       .save();
 
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async updateResourceRating(
+    @Ctx() ctx: MyContext,
+    @Arg('id', () => Int) id: number,
+    @Arg('input', () => ResourceRatingUpdateInput)
+    input: ResourceRatingUpdateInput
+  ) {
+    const resourceRating = await this.resourceRatingRepo.findOne(id, {
+      where: { user: { id: ctx.req.userId } },
+    });
+    if (!resourceRating) {
+      throw new ApolloError('No resource matching ID ' + id);
+    }
+    input.updatedAt = Math.floor(Number(new Date())).toString();
+
+    await this.resourceRatingRepo.update({ id }, input);
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async deleteResourceRating(
+    @Ctx() ctx: MyContext,
+    @Arg('id', () => Int) id: number
+  ) {
+    const resourceRating = await this.resourceRatingRepo.findOne(id, {
+      where: { user: { id: ctx.req.userId } },
+    });
+    if (!resourceRating) {
+      throw new ApolloError('No resource matching ID ' + id);
+    }
+    await this.resourceRatingRepo.delete({ id });
     return true;
   }
 
