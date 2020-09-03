@@ -2,6 +2,8 @@ import bcrypt from 'bcryptjs';
 import { Arg, Ctx, Mutation, Resolver, Query } from 'type-graphql';
 import addDays from 'date-fns/addDays';
 import addMinutes from 'date-fns/addMinutes';
+import { Repository } from 'typeorm';
+import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import { createTokens } from './../auth';
 import { User } from '../entity/User';
@@ -21,13 +23,20 @@ const invalidLoginResponse = {
 
 @Resolver()
 export class AuthResolver {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+    @InjectRepository(UserProfile)
+    private readonly userProfileRepo: Repository<UserProfile>
+  ) {}
+
   @Mutation(() => UserResponse)
   async register(
     @Arg('input')
     { email, password, first_name, last_name }: RegisterInput
   ): Promise<UserResponse> {
     const hashedPassword = await bcrypt.hash(password, 12);
-    const existingUser = await User.findOne({ email });
+    const existingUser = await this.userRepo.findOne({ email });
 
     if (existingUser) {
       return {
@@ -40,15 +49,17 @@ export class AuthResolver {
       };
     }
 
-    const profile = await UserProfile.create().save();
+    const profile = await this.userProfileRepo.create().save();
 
-    const user = await User.create({
-      email,
-      password: hashedPassword,
-      first_name,
-      last_name,
-      profile,
-    }).save();
+    const user = await this.userRepo
+      .create({
+        email,
+        password: hashedPassword,
+        first_name,
+        last_name,
+        profile,
+      })
+      .save();
 
     return { user };
   }
@@ -58,7 +69,7 @@ export class AuthResolver {
     @Arg('input') { email, password }: AuthInput,
     @Ctx() ctx: MyContext
   ): Promise<UserResponse> {
-    const user = await User.findOne({ where: { email } });
+    const user = await this.userRepo.findOne({ where: { email } });
 
     if (!user) {
       return invalidLoginResponse;
@@ -88,7 +99,7 @@ export class AuthResolver {
       return undefined;
     }
 
-    return User.findOne(ctx.req.userId, { relations: ['profile'] });
+    return this.userRepo.findOne(ctx.req.userId, { relations: ['profile'] });
   }
 
   @Mutation(() => Boolean)
@@ -107,7 +118,7 @@ export class AuthResolver {
       return false;
     }
 
-    const user = await User.findOne(ctx.req.userId);
+    const user = await this.userRepo.findOne(ctx.req.userId);
     if (!user) {
       return false;
     }

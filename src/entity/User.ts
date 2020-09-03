@@ -6,7 +6,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, ObjectType, Int } from 'type-graphql';
 
 import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
 import { ResourceRating } from './ResourceRating';
@@ -36,9 +36,9 @@ export class User extends BaseTableEntity {
   @Column('text', { unique: true })
   email: string;
 
-  @Field(() => [String])
-  @Column('text', { array: true, default: '{}' })
-  roles: string[];
+  @Field(() => [Int])
+  @Column('int', { array: true, default: '{}' })
+  roles: number[];
 
   @Column()
   password: string;

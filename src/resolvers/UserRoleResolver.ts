@@ -8,6 +8,8 @@ import {
   Int,
   UseMiddleware,
 } from 'type-graphql';
+import { Repository } from 'typeorm';
+import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import { isAuth } from '../middleware/isAuth';
 import { UserRole } from '../entity/UserRole';
@@ -22,12 +24,16 @@ class UserRoleInput {
 
 @Resolver()
 export class UserRoleResolver {
+  constructor(
+    @InjectRepository(UserRole)
+    private readonly userRoleRepo: Repository<UserRole>
+  ) {}
   @Mutation(() => UserRole)
   @UseMiddleware(isAuth)
   async createUserRole(
     @Arg('options', () => UserRoleInput) options: UserRoleInput
   ) {
-    const userRole = await UserRole.create(options).save();
+    const userRole = await this.userRoleRepo.create(options).save();
     return userRole;
   }
 
@@ -44,7 +50,7 @@ export class UserRoleResolver {
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async deleteUserRole(@Arg('id', () => Int) id: number) {
-    const res = await UserRole.delete({ id });
+    const res = await this.userRoleRepo.delete({ id });
     if (res.affected) {
       return true;
     }
@@ -53,6 +59,6 @@ export class UserRoleResolver {
 
   @Query(() => [UserRole])
   userRoles() {
-    return UserRole.find();
+    return this.userRoleRepo.find();
   }
 }

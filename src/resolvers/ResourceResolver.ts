@@ -9,6 +9,8 @@ import {
   UseMiddleware,
   Ctx,
 } from 'type-graphql';
+import { Repository } from 'typeorm';
+import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import { MyContext } from './../graphql-types/MyContext';
 import { isAuth } from '../middleware/isAuth';
@@ -57,17 +59,24 @@ class ResourceUpdateInput {
 
 @Resolver()
 export class ResourceResolver {
+  constructor(
+    @InjectRepository(Resource)
+    private readonly resourceRepo: Repository<Resource>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>
+  ) {}
+
   @Mutation(() => Resource)
   @UseMiddleware(isAuth)
   async createResource(
     @Ctx() ctx: MyContext,
     @Arg('options', () => ResourceInput) options: ResourceInput
   ) {
-    const addedByUser = await User.findOne(ctx.req.userId);
+    const addedByUser = await this.userRepo.findOne(ctx.req.userId);
     if (addedByUser) {
       options.added_by = addedByUser;
     }
-    const resource = await Resource.create(options).save();
+    const resource = await this.resourceRepo.create(options).save();
     return resource;
   }
 
@@ -78,14 +87,14 @@ export class ResourceResolver {
     @Arg('input', () => ResourceUpdateInput) input: ResourceUpdateInput
   ) {
     input.updatedAt = Math.floor(Number(new Date())).toString(); // TypeORM @BeforeUpdate doesnt trigger on .update, only save()
-    await Resource.update({ id }, input);
+    await this.resourceRepo.update({ id }, input);
     return true;
   }
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async deleteResource(@Arg('id', () => Int) id: number) {
-    const res = await Resource.delete({ id });
+    const res = await this.resourceRepo.delete({ id });
     if (res.affected) {
       return true;
     }
@@ -94,7 +103,7 @@ export class ResourceResolver {
 
   @Query(() => [Resource])
   resources() {
-    return Resource.find({
+    return this.resourceRepo.find({
       relations: ['views', 'added_by', 'added_by.profile'],
     });
   }

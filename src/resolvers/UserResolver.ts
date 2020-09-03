@@ -7,8 +7,9 @@ import {
   InputType,
   Field,
 } from 'type-graphql';
-import * as Parallel from 'async-parallel';
 import { ApolloError } from 'apollo-server-express';
+import { Repository } from 'typeorm';
+import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import { isAuth, hasRoleOrOwner, hasRole } from '../middleware/isAuth';
 import { UserRole } from './../entity/UserRole';
@@ -40,6 +41,15 @@ class updateUserProfileInput {
 
 @Resolver()
 export class UserResolver {
+  constructor(
+    @InjectRepository(UserProfile)
+    private readonly userProfileRepo: Repository<UserProfile>,
+    @InjectRepository(UserRole)
+    private readonly userRoleRepo: Repository<UserRole>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>
+  ) {}
+
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth, hasRoleOrOwner('su'))
   async updateUserProfile(
@@ -47,7 +57,7 @@ export class UserResolver {
     @Arg('input', () => updateUserProfileInput) input: updateUserProfileInput
   ) {
     input.updatedAt = Math.floor(Number(new Date())).toString(); // TypeORM @BeforeUpdate doesnt trigger on .update, only save()
-    await UserProfile.update({ id }, input);
+    await this.userProfileRepo.update({ id }, input);
     return true;
   }
 
@@ -57,21 +67,24 @@ export class UserResolver {
     @Arg('id', () => Int) id: number,
     @Arg('input', () => updateUserRolesInput) input: updateUserRolesInput
   ) {
-    const usersRoles: string[] = await Parallel.reduce<number, string[]>(
-      input.roles,
-      async (acc, val) => {
-        const role = await UserRole.findOne({ where: { id: val } });
-        if (role) {
-          acc.push(role.shortCode);
-        }
-        return acc;
-      },
-      []
-    );
+    // const usersRoles: string[] = await Parallel.reduce<number, string[]>(
+    //   input.roles,
+    //   async (acc, val) => {
+    //     const role = await this.userRoleRepo.findOne({ where: { id: val } });
+    //     if (role) {
+    //       acc.push(role.shortCode);
+    //     }
+    //     return acc;
+    //   },
+    //   []
+    // );
 
     const updatedAt = Math.floor(Number(new Date())).toString();
 
-    const update = await User.update({ id }, { roles: usersRoles, updatedAt });
+    const update = await this.userRepo.update(
+      { id },
+      { roles: input.roles, updatedAt }
+    );
     if (update.affected === 0) {
       throw new ApolloError('did not update');
     }

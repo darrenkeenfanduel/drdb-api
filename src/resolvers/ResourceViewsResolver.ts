@@ -9,6 +9,8 @@ import {
   Int,
   UseMiddleware,
 } from 'type-graphql';
+import { Repository } from 'typeorm';
+import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import { ResourceViews } from './../entity/ResourceViews';
 import { Resource } from './../entity/Resource';
@@ -23,16 +25,25 @@ class ResourceViewInput {
 
 @Resolver()
 export class ResourceViewsResolver {
+  constructor(
+    @InjectRepository(Resource)
+    private readonly resourceRepo: Repository<Resource>,
+    @InjectRepository(ResourceViews)
+    private readonly resourceViewsRepo: Repository<ResourceViews>
+  ) {}
+
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async newResourceView(
     @Arg('options', () => ResourceViewInput) options: ResourceViewInput
   ) {
-    const currentViewRow = await ResourceViews.findOne(options.resourceId);
+    const currentViewRow = await this.resourceViewsRepo.findOne(
+      options.resourceId
+    );
     const updatedAt = Math.floor(Number(new Date())).toString();
     if (currentViewRow) {
       currentViewRow.updatedAt = updatedAt;
-      const update = await ResourceViews.update(
+      const update = await this.resourceViewsRepo.update(
         { id: currentViewRow.id },
         { total: currentViewRow.total + 1, updatedAt }
       );
@@ -41,13 +52,15 @@ export class ResourceViewsResolver {
       }
       throw new ApolloError('Nothing was updated');
     }
-    const resource = await Resource.findOne(options.resourceId);
+    const resource = await this.resourceRepo.findOne(options.resourceId);
     if (!resource) {
       throw new ApolloError('No resource exists');
     }
 
-    const newResourceViewsRow = await ResourceViews.create({ resource }).save();
-    await Resource.update(resource.id, {
+    const newResourceViewsRow = await this.resourceViewsRepo
+      .create({ resource })
+      .save();
+    await this.resourceRepo.update(resource.id, {
       views: newResourceViewsRow,
       updatedAt,
     });
@@ -57,6 +70,6 @@ export class ResourceViewsResolver {
 
   @Query(() => [ResourceViews])
   resourceViews() {
-    return ResourceViews.find({ relations: ['resource'] });
+    return this.resourceViewsRepo.find({ relations: ['resource'] });
   }
 }

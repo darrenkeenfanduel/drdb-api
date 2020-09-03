@@ -146,7 +146,7 @@ type User {
   first_name: String!
   last_name: String!
   email: String!
-  roles: [String!]!
+  roles: [Int!]!
 
   # Attached profile of user
   profile: UserProfile!
