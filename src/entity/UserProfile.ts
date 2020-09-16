@@ -1,28 +1,33 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
 import { Field, ObjectType } from 'type-graphql';
 
 import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
+import { User } from './User';
 
 @ObjectType()
 @Entity()
 export class UserProfile extends BaseTableEntity {
   @Field()
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn()
+  userId: number;
+
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  user: User;
 
   @Field(() => String, { nullable: true })
   @Column('text', { nullable: true })
-  avatar?: string;
+  avatar: string | null;
 
   @Field(() => String, { nullable: true })
   @Column('text', { nullable: true })
-  dob?: string;
+  dob: string | null;
 
   @Field()
   @Column('boolean', { default: false })
-  marketing_preference: boolean;
+  marketingPreference: boolean;
 
   @Field(() => String, { nullable: true })
   @Column('text', { nullable: true })
-  marketing_method_preference?: string;
+  marketingMethodPreference: string | null;
 }

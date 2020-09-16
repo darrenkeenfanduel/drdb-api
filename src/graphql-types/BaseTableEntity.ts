@@ -1,24 +1,13 @@
-import { BaseEntity, Column, BeforeUpdate, BeforeInsert } from 'typeorm';
+import { BaseEntity, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
 export abstract class BaseTableEntity extends BaseEntity {
-  @Field({ nullable: true })
-  @Column({ name: 'created_at', nullable: true })
-  public createdAt: string;
+  @Field(() => String)
+  @CreateDateColumn()
+  createdAt: Date;
 
-  @Field({ nullable: true })
-  @Column({ name: 'updated_at', nullable: true })
-  public updatedAt: string;
-
-  @BeforeUpdate()
-  public setUpdatedAt() {
-    this.updatedAt = Math.floor(Number(new Date())).toString();
-  }
-
-  @BeforeInsert()
-  public setCreatedAt() {
-    this.updatedAt = Math.floor(Number(new Date())).toString();
-    this.createdAt = Math.floor(Number(new Date())).toString();
-  }
+  @Field(() => String)
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

@@ -2,14 +2,12 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
-  JoinColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
-import { Field, ObjectType, Int } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 
 import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
-import { ResourceRating } from './ResourceRating';
 
 import { Resource } from './Resource';
 import { UserProfile } from './UserProfile';
@@ -19,35 +17,35 @@ import { UserProfile } from './UserProfile';
 export class User extends BaseTableEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Field()
-  @Column()
-  first_name: string;
+  @Column({ unique: true })
+  username!: string;
 
   @Field()
-  @Column()
-  last_name: string;
-
-  @Column('int', { default: 0 })
-  count: number;
+  @Column({ unique: true })
+  email!: string;
 
   @Field()
-  @Column('text', { unique: true })
-  email: string;
+  @Column({ nullable: true })
+  firstName: string;
 
-  @Field(() => [Int])
-  @Column('int', { array: true, default: '{}' })
-  roles: number[];
+  @Field()
+  @Column({ nullable: true })
+  lastName: string;
+
+  // @Field(() => [Int])
+  // @Column('int', { array: true, default: '{}' })
+  // roles: number[];
 
   @Column()
   password: string;
 
-  @OneToMany(() => Resource, (resource) => resource.added_by)
+  @OneToMany(() => Resource, (resource) => resource.addedBy)
   resources: Resource[];
 
-  @OneToOne(() => UserProfile)
-  @Field(() => UserProfile, { description: 'Attached profile of user' })
-  @JoinColumn()
+  @Field(() => UserProfile)
+  @OneToOne(() => UserProfile, (userProfile) => userProfile.user)
   profile: UserProfile;
 }

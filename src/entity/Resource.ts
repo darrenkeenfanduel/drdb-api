@@ -1,71 +1,66 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Field, Int, ObjectType } from 'type-graphql';
 
-import { ResourceViews } from './ResourceViews';
-import { User } from './User';
 import { BaseTableEntity } from '../graphql-types/BaseTableEntity';
+import { User } from './User';
 
 @ObjectType()
 @Entity()
 export class Resource extends BaseTableEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Field()
   @Column()
-  title: string;
+  title!: string;
 
   @Field()
   @Column()
-  small_description: string;
+  smallDescription!: string;
 
   @Field()
   @Column()
-  description: string;
+  description!: string;
 
   @Field(() => Int, { nullable: true })
-  @Column('int', { nullable: true })
-  length?: number;
-
-  @Field()
-  @Column('text', { default: 'unknown' })
-  author?: string;
+  @Column({ type: 'int', nullable: true })
+  length: number | null;
 
   @Field(() => String, { nullable: true })
-  @Column('text', { nullable: true })
-  author_url?: string;
+  @Column({ type: 'text', default: 'unknown', nullable: true })
+  author: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: 'text', nullable: true })
+  authorUrl: string | null;
 
   @Field()
   @Column()
-  external_url: string;
+  externalUrl!: string;
 
-  @ManyToOne(() => User, (user) => user.resources)
+  @Field()
+  @Column()
+  addedById: number;
+
   @Field(() => User)
-  @JoinColumn()
-  added_by: User;
+  @ManyToOne(() => User, (user) => user.resources)
+  addedBy: User;
 
-  @OneToOne(() => ResourceViews, (resourceViews) => resourceViews.resource)
-  @Field(() => ResourceViews, { nullable: true })
-  @JoinColumn()
-  views?: ResourceViews;
-
-  @Field()
-  @Column()
-  cost: string;
+  // @OneToOne(() => ResourceViews, (resourceViews) => resourceViews.resource)
+  // @Field(() => ResourceViews, { nullable: true })
+  // @JoinColumn()
+  // views?: ResourceViews;
 
   @Field()
   @Column()
-  type: string;
+  cost!: string;
 
   @Field()
   @Column()
-  level: string;
+  type!: string;
+
+  @Field()
+  @Column()
+  level!: string;
 }

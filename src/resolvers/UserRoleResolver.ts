@@ -9,7 +9,6 @@ import {
   UseMiddleware,
 } from 'type-graphql';
 import { Repository } from 'typeorm';
-import { InjectRepository } from 'typeorm-typedi-extensions';
 
 import { isAuth } from '../middleware/isAuth';
 import { UserRole } from '../entity/UserRole';

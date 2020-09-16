@@ -5,11 +5,10 @@ import { User } from './../entity/User';
 import { UserRole } from './../entity/UserRole';
 import { MyContext } from '../graphql-types/MyContext';
 
-export const isAuth: MiddlewareFn<MyContext> = async ({ context }, next) => {
-  if (!context.req.userId) {
-    throw new ApolloError('not authenticated');
+export const isAuth: MiddlewareFn<MyContext> = ({ context }, next) => {
+  if (!context.req.session.userId) {
+    throw new Error('not authenticated');
   }
-
   return next();
 };
 

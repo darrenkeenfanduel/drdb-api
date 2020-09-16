@@ -1,115 +1,84 @@
-require('dotenv').config();
 import 'reflect-metadata';
-import { createConnection, getConnectionOptions, useContainer } from 'typeorm';
+import { createConnection } from 'typeorm';
 import express from 'express';
+import 'dotenv-safe/config';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
-import { Container } from 'typedi';
-import cookieParser from 'cookie-parser';
-import { verify } from 'jsonwebtoken';
-import addSeconds from 'date-fns/addSeconds';
-import addDays from 'date-fns/addDays';
+import session from 'express-session';
+import Redis from 'ioredis';
+import connectRedis from 'connect-redis';
 
-import { createTokens } from './auth';
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from './helpers/secrets';
-import { AuthResolver } from './resolvers/AuthResolver';
-import { ResourceResolver } from './resolvers/ResourceResolver';
-import { ResourceViewsResolver } from './resolvers/ResourceViewsResolver';
-import { ResourceRatingResolver } from './resolvers/ResourceRatingResolver';
-import { UserRoleResolver } from './resolvers/UserRoleResolver';
-import { UserFavouriteResolver } from './resolvers/UserFavouriteResolver';
 import { UserResolver } from './resolvers/UserResolver';
+import { COOKIE_NAME, __prod__ } from './constants';
 import { User } from './entity/User';
-
-useContainer(Container);
+import path from 'path';
+import { Resource } from './entity/Resource';
+import { ResourceResolver } from './resolvers/ResourceResolver';
+import { createUserLoader } from './utils/createUserLoader';
+import { UserProfile } from './entity/UserProfile';
+import { UserProfileResolver } from './resolvers/UserProfileResolver';
 
 (async () => {
+  // const options = await getConnectionOptions(
+  //   process.env.NODE_ENV || 'development'
+  // );
+  const conn = await createConnection({
+    type: 'postgres',
+    url: process.env.DATABASE_URL,
+    logging: true,
+    synchronize: true,
+    entities: [User, Resource, UserProfile],
+    migrations: [path.join(__dirname, './migrations/*')],
+  });
+
+  conn.runMigrations();
+
   const app = express();
 
-  app.use(cookieParser());
+  const RedisStore = connectRedis(session);
+  const redis = new Redis(process.env.REDIS_URL);
 
-  const options = await getConnectionOptions(
-    process.env.NODE_ENV || 'development'
+  app.set('trust proxy', 1);
+
+  app.use(
+    session({
+      name: COOKIE_NAME,
+      store: new RedisStore({
+        client: redis,
+        disableTouch: true,
+      }),
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+        httpOnly: true,
+        sameSite: 'lax', //csrf
+        secure: __prod__, // Only in HTTPS
+        domain: __prod__ ? '.darrenkeen.co.uk' : undefined,
+      },
+      saveUninitialized: false,
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+    })
   );
-  await createConnection({ ...options, name: 'default' });
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [
-        AuthResolver,
-        ResourceResolver,
-        ResourceViewsResolver,
-        ResourceRatingResolver,
-        UserRoleResolver,
-        UserResolver,
-        UserFavouriteResolver,
-      ],
-      container: Container,
-      validate: true,
-      emitSchemaFile: {
-        path: __dirname + '/schema.graphql',
-        commentDescriptions: true,
-      },
+      resolvers: [UserResolver, ResourceResolver, UserProfileResolver],
+      validate: false,
     }),
-    context: ({ req, res }) => ({ req, res }),
-    playground: {
-      settings: {
-        'request.credentials': 'include',
-      },
-    },
+    context: ({ req, res }) => ({
+      req,
+      res,
+      redis,
+      userLoader: createUserLoader(),
+    }),
   });
 
-  app.use(async (req, res, next) => {
-    const accessToken = req.cookies['access-token'];
-    const refreshToken = req.cookies['refresh-token'];
-    if (!accessToken && !refreshToken) {
-      return next();
-    }
-    try {
-      const data = verify(accessToken, ACCESS_TOKEN_SECRET!) as {
-        userId: number;
-      };
-      req.userId = data.userId;
-      return next();
-    } catch {}
-
-    if (!refreshToken) {
-      next();
-    }
-
-    let data;
-
-    try {
-      data = verify(refreshToken, REFRESH_TOKEN_SECRET!) as {
-        userId: number;
-        count: number;
-      };
-    } catch {
-      return next();
-    }
-
-    const user = await User.findOne(data.userId);
-    if (!user || user.count !== data.count) {
-      return next();
-    }
-    const tokens = createTokens(user);
-
-    res.cookie('refresh-token', tokens.refreshToken, {
-      expires: addDays(new Date(), 7),
-    });
-
-    res.cookie('access-token', tokens.accessToken, {
-      expires: addSeconds(new Date(), 15),
-    });
-    req.userId = data.userId;
-
-    next();
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
   });
 
-  apolloServer.applyMiddleware({ app, cors: false });
-
-  const port = process.env.PORT || 4000;
-  app.listen(port, () => {
-    console.log(`server started at http://localhost:${port}/graphql`);
+  app.listen(parseInt(process.env.PORT), () => {
+    console.log(`Server started on localhost:${process.env.PORT}`);
   });
 })();
